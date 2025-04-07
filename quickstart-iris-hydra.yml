@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2025 Deutsche Telekom AG
+#
+# SPDX-License-Identifier: Apache-2.0
+services:
+  hydra-migrate:
+    image: iris-hydra:latest
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile-iris-hydra
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+  hydra:
+    image: iris-hydra:latest
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile-iris-hydra
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+  postgresd:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=hydra
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=hydra
+    networks:
+      - intranet
