@@ -49,19 +49,43 @@ Since Iris-Hydra is a fork of Hydra, it is licensed under same license, Apache
 **Important:** For new files, the license header should be added as per the
 SPDX-License-Identifier tag at the top of this README file.
 
-## Running locally
+## Quickstart
 
-To build and run Iris-Hydra locally, you can use the provided
-`quickstart-iris-hydra` docker-compose file:
+### Build and run locally
+
+You can use the provided `quickstart-iris-hydra` docker-compose file to build
+and run Iris-Hydra. Postgres shall be used as the database backend.
 
 ```shell
 docker compose -f quickstart.yml -f quickstart-iris-hydra.yml up -d --build
 ```
 
-To debug with the Delve debugger use `quickstart-iris-hydra-debug.yml` file.
-Then attach the debugger to the running container on port 40000:
+Alternatively, for debugging with the Delve debugger use
+`quickstart-iris-hydra-debug.yml` file. Then attach the debugger to the running
+container on port `40000`, either from the command line as shown here, or from
+an IDE.
 
 ```shell
 docker compose -f quickstart.yml -f quickstart-iris-hydra-debug.yml up -d --build
-dlv connect :40000
+dlv connect :40000 # attach from command line
+```
+
+### Running tests
+
+The following script will create a client and request a JWT token:
+
+```shell
+client=$(docker exec -it iris-hydra hydra create client \
+  --endpoint http://127.0.0.1:4445/ \
+  --format json \
+  --grant-type client_credentials \
+  --token-endpoint-auth-method client_secret_post \
+  --access-token-strategy jwt) &&
+client_id=$(echo $client | jq -r '.client_id') &&
+client_secret=$(echo $client | jq -r '.client_secret') &&
+docker exec -it iris-hydra hydra perform client-credentials \
+  --endpoint http://127.0.0.1:4444/ \
+  --client-id "$client_id" \
+  --client-secret "$client_secret" \
+  --format json
 ```

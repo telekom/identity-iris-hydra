@@ -7,8 +7,8 @@
 # CGO is disabled to ensure that the binary is statically linked.
 # Support for sqlite is disabled.
 
-ARG GO_IMAGE=golang:1.22
-ARG DISTROLESS_IMAGE=gcr.io/distroless/static-debian12:debug-nonroot
+ARG GO_IMAGE=dockerhub.devops.telekom.de/ghub.docker.com/golang:1.22
+ARG DISTROLESS_IMAGE=dockerhub.devops.telekom.de/gcr.io/gcr.io/distroless/static-debian12:debug-nonroot
 
 FROM ${GO_IMAGE} AS builder
 

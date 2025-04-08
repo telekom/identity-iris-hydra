@@ -11,6 +11,7 @@ services:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
   hydra:
     image: iris-hydra:debug
+    container_name: iris-hydra
     build:
       context: .
       dockerfile: .docker/Dockerfile-iris-hydra-debug
@@ -24,7 +25,7 @@ services:
     entrypoint: ["/usr/bin/dlv"]
     command:
       "--listen=:40000 --headless --api-version=2 --accept-multiclient exec
-      /usr/bin/hydra -- serve all --dev"
+      /usr/bin/hydra -- serve -c /etc/config/hydra/hydra.yml all --dev"
   postgresd:
     image: postgres:16
     ports:

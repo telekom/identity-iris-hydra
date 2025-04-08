@@ -11,6 +11,7 @@ services:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
   hydra:
     image: iris-hydra:latest
+    container_name: iris-hydra
     build:
       context: .
       dockerfile: .docker/Dockerfile-iris-hydra
