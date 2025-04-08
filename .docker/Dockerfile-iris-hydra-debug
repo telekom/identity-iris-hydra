@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2025 Deutsche Telekom AG
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# This Dockerfile is used to build the iris-hydra image.
+# Uses distroless base image, with a statically linked executable.
+# CGO is disabled to ensure that the binary is statically linked.
+# Support for sqlite is disabled.
+# Debugging information and the Delve debugger are included in the image.
+
+ARG GO_IMAGE=golang:1.22
+ARG DISTROLESS_IMAGE=gcr.io/distroless/static-debian12:debug-nonroot
+
+FROM ${GO_IMAGE} AS builder
+
+WORKDIR /go/src/github.com/ory/hydra
+
+RUN apt-get update && apt-get upgrade -y &&\
+    mkdir -p ./internal/httpclient
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient/
+
+ENV CGO_ENABLED=0
+
+RUN go mod download
+
+COPY . .
+# Build with debugging information
+RUN go build -gcflags "all=-N -l" -o /usr/bin/hydra
+
+# Build the Delve debugger
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+#########################
+
+FROM ${DISTROLESS_IMAGE} AS runner
+
+COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+COPY --from=builder /go/bin/dlv /usr/bin/dlv
+
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+# Delve debugger port
+EXPOSE 40000
+
+ENTRYPOINT ["hydra"]
+CMD ["serve", "all"]
