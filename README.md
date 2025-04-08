@@ -49,11 +49,19 @@ Since Iris-Hydra is a fork of Hydra, it is licensed under same license, Apache
 **Important:** For new files, the license header should be added as per the
 SPDX-License-Identifier tag at the top of this README file.
 
-## Quickstart
+## Running locally
 
 To build and run Iris-Hydra locally, you can use the provided
 `quickstart-iris-hydra` docker-compose file:
 
 ```shell
 docker compose -f quickstart.yml -f quickstart-iris-hydra.yml up -d --build
+```
+
+To debug with the Delve debugger use `quickstart-iris-hydra-debug.yml` file.
+Then attach the debugger to the running container on port 40000:
+
+```shell
+docker compose -f quickstart.yml -f quickstart-iris-hydra-debug.yml up -d --build
+dlv connect :40000
 ```
