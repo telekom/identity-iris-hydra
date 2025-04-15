@@ -42,14 +42,14 @@ const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
-		conn        *pop.Connection
-		mb          *popx.MigrationBox
-		mbs         popx.MigrationStatuses
-		r           Dependencies
-		config      *config.DefaultProvider
-		l           *logrusx.Logger
-		fallbackNID uuid.UUID
-		p           *networkx.Manager
+		conn           *pop.Connection
+		mb             *popx.MigrationBox
+		mbs            popx.MigrationStatuses
+		r              Dependencies
+		config         *config.DefaultProvider
+		l              *logrusx.Logger
+		fallbackNID    uuid.UUID
+		networkManager persistence.NetworkManager
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -119,7 +119,7 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	return errorsx.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
+func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, nm persistence.NetworkManager, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
 	mb, err := popx.NewMigrationBox(
 		fsx.Merge(append([]fs.FS{Migrations}, extraMigrations...)...),
 		popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0),
@@ -129,17 +129,17 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 	}
 
 	return &Persister{
-		conn:   c,
-		mb:     mb,
-		r:      r,
-		config: config,
-		l:      r.Logger(),
-		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		conn:           c,
+		mb:             mb,
+		r:              r,
+		config:         config,
+		l:              r.Logger(),
+		networkManager: nm,
 	}, nil
 }
 
-func (p *Persister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
-	return p.p.Determine(ctx)
+func (p Persister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
+	return p.networkManager.Determine(ctx)
 }
 
 func (p Persister) WithFallbackNetworkID(nid uuid.UUID) persistence.Persister {

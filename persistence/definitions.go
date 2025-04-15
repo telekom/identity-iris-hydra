@@ -45,4 +45,8 @@ type (
 		NetworkID(ctx context.Context) uuid.UUID
 		DetermineNetwork(ctx context.Context) (*networkx.Network, error)
 	}
+
+	NetworkManager interface {
+		Determine(ctx context.Context) (*networkx.Network, error)
+	}
 )

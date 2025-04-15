@@ -267,6 +267,10 @@ dsn: memory
 # dsn: postgres://user:password@host:123/database
 # dsn: mysql://user:password@tcp(host:123)/database
 
+network:
+  id: 4b26c191-e56f-4513-ba16-55c1f32d689b
+  strategy: static #automatic
+
 # hsm configures Hardware Security Module for hydra.openid.id-token, hydra.jwt.access-token keys
 # Either slot or token_label must be set. If token_label is set, then first slot in index with this label is used.
 hsm:

@@ -109,6 +109,8 @@ const (
 	KeyRefreshTokenHook                          = "oauth2.refresh_token_hook" // #nosec G101
 	KeyTokenHook                                 = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
+	KeyNetworkID                                 = "network.id"
+	KeyNetworkStrategy                           = "network.strategy"
 )
 
 const DSNMemory = "memory"
@@ -648,6 +650,38 @@ func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Co
 
 func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {
 	return p.getProvider(ctx).DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+}
+
+type NetworkStrategy string
+
+const (
+	NetworkStrategyAutomatic = "automatic"
+	NetworkStrategyStatic    = "static"
+)
+
+func (p *DefaultProvider) NetworkID(ctx context.Context) uuid.UUID {
+	nidStr := p.getProvider(ctx).String(KeyNetworkID)
+	if nidStr == "" {
+		return uuid.Nil
+	}
+	nid, err := uuid.FromString(nidStr)
+	if err != nil {
+		p.l.WithError(errors.WithStack(err)).Errorf("Value %s cannot be decoded as a UUID", nidStr)
+		return uuid.Nil
+	}
+	return nid
+}
+
+func (p *DefaultProvider) NetworkStrategy(ctx context.Context) NetworkStrategy {
+	strategy := p.getProvider(ctx).String(KeyNetworkStrategy)
+	switch strategy {
+	case NetworkStrategyAutomatic, "":
+		return NetworkStrategyAutomatic
+	case NetworkStrategyStatic:
+		return NetworkStrategyStatic
+	default:
+		return NetworkStrategyAutomatic
+	}
 }
 
 func (p *DefaultProvider) CookieDomain(ctx context.Context) string {

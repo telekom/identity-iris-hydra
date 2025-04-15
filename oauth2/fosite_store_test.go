@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/v2/internal/testhelpers"
 
 	"github.com/ory/hydra/v2/driver"
@@ -71,6 +73,10 @@ func TestManagers(t *testing.T) {
 				t.Run("database="+k, func(t *testing.T) {
 					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true, &contextx.Default{})
 					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+
+					net, err := store.Persister().DetermineNetwork(ctx)
+					require.NoError(t, err)
+					store.WithContextualizer(&contextx.Static{NID: net.ID, C: store.Config().Source(ctx)})
 
 					if k != "memory" {
 						t.Run("testHelperUniqueConstraints", testHelperRequestIDMultiples(store, k))

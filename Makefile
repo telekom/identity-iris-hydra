@@ -4,6 +4,7 @@ export GO111MODULE 		:= on
 export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
 export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
+export TZ 					:= UTC
 
 GOLANGCI_LINT_VERSION = 1.61.0
 
