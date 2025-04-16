@@ -103,7 +103,7 @@ authors:  # updates the AUTHORS file
 # Formats the code
 .PHONY: format
 format: .bin/goimports .bin/ory node_modules
-	.bin/ory dev headers copyright --type=open-source --exclude=internal/httpclient
+#	.bin/ory dev headers --type=open-source --exclude=internal/httpclient
 	.bin/goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 
