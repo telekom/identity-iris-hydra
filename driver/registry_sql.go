@@ -228,6 +228,7 @@ func (m *RegistrySQL) Init(
 				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
 				return err
 			}
+			m.Logger().Print("Using network id %s (%s)", net.ID, m.Config().NetworkStrategy(ctx))
 
 			m.persister = p.WithFallbackNetworkID(net.ID)
 		}
