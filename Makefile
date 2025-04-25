@@ -4,6 +4,7 @@ export GO111MODULE 		:= on
 export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
 export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
+export TZ 					:= UTC
 
 GOLANGCI_LINT_VERSION = 1.61.0
 
@@ -102,7 +103,7 @@ authors:  # updates the AUTHORS file
 # Formats the code
 .PHONY: format
 format: .bin/goimports .bin/ory node_modules
-	.bin/ory dev headers copyright --type=open-source --exclude=internal/httpclient
+#	.bin/ory dev headers --type=open-source --exclude=internal/httpclient
 	.bin/goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 

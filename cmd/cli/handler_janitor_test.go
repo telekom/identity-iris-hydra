@@ -44,6 +44,7 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan(ctx).String()),
@@ -77,6 +78,7 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
@@ -113,6 +115,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
@@ -135,6 +138,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
@@ -161,6 +165,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
@@ -182,6 +187,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
@@ -196,16 +202,19 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 func TestJanitorHandler_Arguments(t *testing.T) {
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		"memory",
 	)
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyTokens),
 		"memory",
 	)
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyGrants),
 		"memory",
 	)
@@ -218,6 +227,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "1000"),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "100"),
@@ -226,6 +236,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "0"),
 		"memory")
@@ -234,6 +245,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "-100"),
 		"memory")
@@ -242,6 +254,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "0"),
 		"memory")
@@ -250,6 +263,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "-100"),
 		"memory")
@@ -258,6 +272,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 
 	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
+		fmt.Sprintf("--%s=%s", cli.NetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b"),
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "100"),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "1000"),
@@ -285,6 +300,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
+					fmt.Sprintf("--%s=%s", cli.NetworkID, jt.GetConfig().NetworkID(ctx)),
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s", cli.OnlyGrants),
 					jt.GetDSN(),

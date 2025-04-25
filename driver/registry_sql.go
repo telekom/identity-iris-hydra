@@ -39,6 +39,7 @@ import (
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/luna-duclos/instrumentedsql"
 
@@ -47,6 +48,7 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/iris"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/persistence/sql"
@@ -54,6 +56,7 @@ import (
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/networkx"
 	otelsql "github.com/ory/x/otelx/sql"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/resilience"
@@ -182,8 +185,8 @@ func (m *RegistrySQL) Init(
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
 			return errorsx.WithStack(err)
 		}
-
-		p, err := sql.NewPersister(ctx, c, m, m.Config(), extraMigrations, goMigrations)
+		networkManager := m.initNetworkManager(ctx, m.Config().NetworkStrategy(ctx), c, m.Config().NetworkID(ctx))
+		p, err := sql.NewPersister(ctx, c, m, m.Config(), networkManager, extraMigrations, goMigrations)
 		if err != nil {
 			return err
 		}
@@ -220,11 +223,12 @@ func (m *RegistrySQL) Init(
 		if skipNetworkInit {
 			m.persister = p
 		} else {
-			net, err := p.DetermineNetwork(ctx)
+			net, err := m.persister.DetermineNetwork(ctx)
 			if err != nil {
 				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
 				return err
 			}
+			m.Logger().Printf("Using network id %s (%s)", net.ID, m.Config().NetworkStrategy(ctx))
 
 			m.persister = p.WithFallbackNetworkID(net.ID)
 		}
@@ -249,6 +253,17 @@ func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
 
 func (m *RegistrySQL) PingContext(ctx context.Context) error {
 	return m.Persister().Ping(ctx)
+}
+
+func (m *RegistrySQL) initNetworkManager(ctx context.Context, strategy config.NetworkStrategy, c *pop.Connection, nid uuid.UUID) persistence.NetworkManager {
+	switch strategy {
+	case config.NetworkStrategyAutomatic:
+		return networkx.NewManager(c, m.Logger(), m.Tracer(ctx))
+	case config.NetworkStrategyStatic:
+		return iris.NewNetworkManager(c, nid)
+	default:
+		return networkx.NewManager(c, m.Logger(), m.Tracer(ctx))
+	}
 }
 
 func (m *RegistrySQL) Ping() error {

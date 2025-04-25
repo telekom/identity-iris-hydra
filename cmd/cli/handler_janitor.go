@@ -37,6 +37,7 @@ const (
 	OnlyGrants             = "grants"
 	ReadFromEnv            = "read-from-env"
 	Config                 = "config"
+	NetworkID              = "network"
 )
 
 type JanitorHandler struct {
@@ -72,6 +73,8 @@ func (*JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 			"Janitor requires at least one of --tokens, --requests or --grants to be set")
 	}
 
+	flagx.MustGetString(cmd, NetworkID)
+
 	limit := flagx.MustGetInt(cmd, Limit)
 	batchSize := flagx.MustGetInt(cmd, BatchSize)
 	if limit <= 0 || batchSize <= 0 {
@@ -99,6 +102,11 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 	co := []configx.OptionModifier{
 		configx.WithFlags(cmd.Flags()),
 		configx.SkipValidation(),
+	}
+
+	if nid := flagx.MustGetString(cmd, NetworkID); nid != "" {
+		co = append(co, configx.WithValue(config.KeyNetworkID, nid))
+		co = append(co, configx.WithValue(config.KeyNetworkStrategy, "static"))
 	}
 
 	keys := map[string]string{

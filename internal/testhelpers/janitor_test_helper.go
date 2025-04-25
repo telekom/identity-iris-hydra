@@ -56,6 +56,8 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 	conf.MustSet(context.Background(), config.KeyRefreshTokenLifespan, lifespan)
 	conf.MustSet(context.Background(), config.KeyConsentRequestMaxAge, lifespan)
 	conf.MustSet(context.Background(), config.KeyLogLevel, "trace")
+	conf.MustSet(context.Background(), config.KeyNetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b")
+	conf.MustSet(context.Background(), config.KeyNetworkStrategy, "static")
 
 	return &JanitorConsentTestHelper{
 		uniqueName:           uniqueName,

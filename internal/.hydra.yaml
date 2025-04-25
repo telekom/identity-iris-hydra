@@ -62,6 +62,10 @@ serve:
 
 dsn: memory
 
+network:
+  id: 4b26c191-e56f-4513-ba16-55c1f32d689b
+  strategy: static #automatic
+
 hsm:
   enabled: false
 

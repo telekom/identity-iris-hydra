@@ -66,6 +66,7 @@ func RegistryFactory(t testing.TB, url string, c *config.DefaultProvider, networ
 	c.MustSet(ctx, config.KeyLogLevel, "trace")
 	c.MustSet(ctx, config.KeyDSN, url)
 	c.MustSet(ctx, "dev", true)
+	c.MustSet(ctx, config.KeyNetworkID, "4b26c191-e56f-4513-ba16-55c1f32d689b")
 
 	r, err := driver.NewRegistryFromDSN(ctx, c, logrusx.New("test_hydra", "master"), networkInit, migrate, ctxer)
 	require.NoError(t, err)
