@@ -29,7 +29,7 @@ jobs:
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
-        run: ./test/conformance/test.sh -v -short -parallel 16
+        run: ./test/conformance/test.sh -v -short -parallel 32
 
   sdk-generate:
     name: Generate SDKs
