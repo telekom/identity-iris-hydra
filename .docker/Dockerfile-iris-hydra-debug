@@ -10,6 +10,7 @@
 
 ARG GO_IMAGE=golang:1.22
 ARG DISTROLESS_IMAGE=gcr.io/distroless/static-debian12:debug-nonroot
+ARG GOPROXY=proxy.golang.org
 
 FROM ${GO_IMAGE} AS builder
 
@@ -22,6 +23,8 @@ COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV CGO_ENABLED=0
+
+ARG GOPROXY
 
 RUN go mod download
 
