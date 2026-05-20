@@ -112,3 +112,4 @@ docker exec -it iris-hydra-m2m hydra perform client-credentials \
   --client-secret "$client_secret" \
   --format json
 ```
+# prt-test-1779272397
